@@ -1,0 +1,105 @@
+<!-- Plyr resources and browser polyfills are specified in the pen settings -->
+<!-- Hls.js 0.9.x and 0.10.x both have critical bugs affecting this demo. Using fixed git hash to when it was working (0.10.0 pre-release), until https://github.com/video-dev/hls.js/issues/1790 has been resolved -->
+<script src="https://cdn.rawgit.com/video-dev/hls.js/18bb552/dist/hls.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/polyfill/v2/polyfill.min.js?features=es6,Array.prototype.includes,CustomEvent,Object.entries,Object.values,URL"></script>
+<script src="https://unpkg.com/plyr@3"></script>
+<script type="text/javascript">
+	document.addEventListener('DOMContentLoaded', () => {
+		
+			setChannel('otv');
+			
+	
+	});</script>
+
+<script type="text/javascript">
+	function setChannel(name) {
+		const source = name == 'otv' ? 'https://livetv.tarangplus.in/otv-origin/live/otv-origin/live_720p/chunks.m3u8' :
+		name == 'ta' ? 'https://livetv.tarangplus.in/tarangtv-origin/live/tarangtv-origin/live_720p/chunks.m3u8' :
+		name == 'pr' ? 'https://livetv.tarangplus.in/prarthana-origin/live/prarthana-origin/live_720p/chunks.m3u8' :
+		name == 'al' ? 'https://livetv.tarangplus.in/alankar-origin/live/alankar-origin/live_720p/chunks.m3u8' :
+			'https://livetv.tarangplus.in/tarangmusic-origin/live/tarangmusic-origin/live_720p/chunks.m3u8'
+			;
+		const video = document.querySelector('video');
+
+		// For more options see: https://github.com/sampotts/plyr/#options
+		// captions.update is required for captions to work with hls.js
+		const player = new Plyr(video, { captions: { active: true, update: true, language: 'en' }, autoplay: true });
+
+		if (!Hls.isSupported()) {
+			video.src = source;
+		} else {
+			// For more Hls.js options, see https://github.com/dailymotion/hls.js
+			const hls = new Hls();
+			hls.loadSource(source);
+			hls.attachMedia(video);
+			window.hls = hls;
+
+			// Handle changing captions
+			player.on('languagechange', () => {
+				// Caption support is still flaky. See: https://github.com/sampotts/plyr/issues/994
+				setTimeout(() => hls.subtitleTrack = player.currentTrack, 50);
+			});
+			player.play()
+		}
+
+		// Expose player so it can be used from the console
+		window.player = player;
+	}
+</script>
+
+<link rel="stylesheet" type="text/css" href="style.css" />
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/plyr@3/dist/plyr.css" />
+
+<div class="container">
+	<video controls crossorigin playsinline poster="https://tarangplus.in/assets/main_logo.png"></video>
+	<ul style=" list-style-type: none;
+	margin: 0;
+	padding: 0;
+	display: flex;">
+		<li>
+
+			<img onclick="setChannel('otv')"
+				src="https://hls.tarangplus.in/tpimages/otvoutputimages/OTV/5d5d22e119521d8a3d000001/medium_16_9.jpg?1582271529"
+				style="border-radius: 12px; margin: 10px;"
+				width="90%"
+				 />
+
+		</li>
+		<li>
+
+			<img onclick="setChannel('ta')" src="https://hls.tarangplus.in/otvoutputimages/Tarang-TV/5d6f556119521ddc4b00000d/medium_16_9.jpg?1656415527"
+			style="border-radius: 12px; margin: 10px;"
+				
+				width="90%"
+				/>
+		</li>
+		<li>
+
+			<img onclick="setChannel('al')" src="https://hls.tarangplus.in/tpimages/otvoutputimages/Alankar/5d6f53d919521d984a000001/medium_16_9.jpg?1582270845"
+			style="border-radius: 12px; margin: 10px;"
+				
+				width="90%"
+				 />
+		</li>
+		<li>
+
+			<img onclick="setChannel('pr')" src="https://hls.tarangplus.in/otvoutputimages/Prarthana-TV/5d6f56ef19521ddc4b000010/medium_16_9.jpg?1730122173"
+			style="border-radius: 12px; margin: 10px;"
+				
+				width="90%"
+				 />
+		</li>
+		<li>
+
+			<img  onclick="setChannel('tm')" src="https://hls.tarangplus.in/tpimages/otvoutputimages/Tarang-Music/5d81cea319521d511800001b/medium_16_9.jpg?1578373797"
+			style="border-radius: 12px; margin: 10px 10px;"
+				
+				width="90%"
+				 />
+		</li>
+		
+		
+		<!-- more li's -->
+	</ul>
+</div>
